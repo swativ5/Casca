@@ -1,0 +1,38 @@
+function Last.starts 2
+push constant 99
+pop local 0
+call Screen.clearScreen 0
+pop temp 0
+call MainMenu.init 0
+pop temp 0
+label WHILE_EXP0
+call Keyboard.keyPressed 0
+push constant 32
+eq
+not
+not
+if-goto WHILE_END0
+push constant 100
+call Sys.wait 1
+pop temp 0
+goto WHILE_EXP0
+label WHILE_END0
+call Screen.clearScreen 0
+pop temp 0
+push local 0
+call DoodleJump.new 1
+pop local 1
+push local 1
+call DoodleJump.run 1
+pop temp 0
+push local 1
+call DoodleJump.dispose 1
+pop temp 0
+call Screen.clearScreen 0
+pop temp 0
+push local 1
+call DoodleJump.getScore 1
+call EndingScreen.show 1
+pop temp 0
+push constant 0
+return
