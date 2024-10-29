@@ -1,0 +1,36 @@
+class MainMenu {
+    function void init() {
+        do MainMenu.prompt();
+        return;
+    }
+
+    function void prompt() {
+	do Screen.drawRectangle(0,0,50,255);
+	do Screen.drawRectangle(461,0,511,255);
+	 do Screen.drawRectangle(50,210,461,255);
+	 do Screen.drawRectangle(50,0,461,50);
+	do Jack.jill(2502);
+        do Output.moveCursor(8, 17);
+        do Output.printString("Hahh.. I can't take this anymore. ");
+	do Output.moveCursor(9, 17);
+ 	do Output.printString("Lets have the real battle");
+	do Output.moveCursor(12, 20);
+       do Output.printString(" CHALLENGE ACCEPTED ");
+       do Jill.jill(4198);
+	do Output.moveCursor(15, 20);
+	do Output.printString(" Always ready. Lets begin the war ");
+	do Output.moveCursor(18, 20);
+	do Output.printString(" AETHERIA IS OURS ");
+	do Sys.wait(5000);
+        do Screen.clearScreen();
+        do Screen.drawRectangle(0,0,50,255);
+	do Screen.drawRectangle(461,0,511,255);
+	 do Screen.drawRectangle(50,205,461,255);
+	 do Screen.drawRectangle(50,0,461,50);
+       do Output.moveCursor(9,22);
+		  do Output.printString("Doodle Jump");
+		  do Output.moveCursor(12,21);
+		do Output.printString("The Final Leap");
+        return;
+    }
+}

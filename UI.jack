@@ -1,0 +1,68 @@
+class UI 
+{
+    field int AttemptsCounter;
+    field int ProgressBarLength;
+    field int ProgressBar;
+    field int WinTime;
+
+    constructor UI new(int winTime) 
+    {
+        let AttemptsCounter = 0;
+        let ProgressBarLength = 200;
+        let ProgressBar = 0;
+        let WinTime = winTime;
+        return this;
+    }
+
+    method void update(int Timer) 
+    {
+        let ProgressBar = (Timer * ProgressBarLength) / WinTime;
+        if (ProgressBar > ProgressBarLength)
+        {
+            let ProgressBar = ProgressBarLength;
+        }
+       
+                    do Output.moveCursor(1,1);
+		  do drawProgressBar(5,2,10);
+        return;
+    }
+
+    // Рисует линию прогресса
+    method void drawProgressBar(int barHeight, int frameHeight, int topStep)
+    {
+        var int x1;
+        var int x2;
+        var int ts;
+        var int bh;
+        var int fh;
+
+        let bh = barHeight;
+        let fh = frameHeight;
+        let x1 = (512/2-1) - (ProgressBarLength/2);
+        let x2 = ProgressBar + x1;
+        let ts = topStep;
+
+        do Screen.drawRectangle(x1 - (2*fh), ts - (2*fh), x1 + ProgressBarLength + (2*fh), ts + bh + (2*fh));
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x1 - fh, ts - fh, x1 + ProgressBarLength + fh, ts + bh + fh);
+        do Screen.setColor(true);
+        do Screen.drawRectangle(x1, ts, x2, ts + bh);
+        return;
+    }
+
+    // Рисует красивую крупную надпись "Attempts:"
+    method void drawAttempt(int location) 
+    {
+        var int memAddress; 
+        let memAddress = 16384+location;
+        // column 0
+        do Memory.poke(memAddress, 32655);
+               return;
+    }
+
+    method void addAttempt() 
+    {
+        let AttemptsCounter = AttemptsCounter + 1;
+        return;
+    }
+}

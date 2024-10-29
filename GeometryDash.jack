@@ -1,0 +1,524 @@
+class GeometryDash 
+{
+    field boolen GameRun;
+
+    field int Ticks;
+    field int TicksLimit;
+    field int Timer;
+    field int WInTime;
+    field int MapSpeed;
+    field int FloorHeight;
+
+    field Array cubes;
+    field int cubesPointer;
+    field Array spikes;
+    field int spikesPointer;
+
+    constructor GeometryDash new() 
+    {
+        let GameRun = true;
+
+        let MapSpeed = 100;
+        let Ticks = 0;
+        let TicksLimit = 3000;
+        let Timer = 1;
+        let WInTime = 45;
+        let FloorHeight = 191;
+
+        let cubes = Array.new(100);
+        let cubesPointer = 0;
+        let spikes = Array.new(100);
+        let spikesPointer = 0;
+        return this;
+    }
+
+    method void run()
+    {
+        var int InputKey;
+
+        var Player2 player;
+        var UI ui;
+        var Floor floor;
+
+        var Cube cube;
+        var Spike spike;
+
+        var int tempCubesPointer;
+        var int delCubesPointer;
+        var int tempSpikesPointer;
+        var int delSpikesPointer;
+
+        let player = Player2.new(128, FloorHeight-48, 48);
+        let ui = UI.new(WInTime);
+        let floor = Floor.new(FloorHeight, MapSpeed);
+
+        while (GameRun)
+        {
+            let InputKey = Keyboard.keyPressed();
+            
+            if ((InputKey = 140) | (InputKey = 81))
+            {
+                let GameRun = false;
+            }
+            if ((InputKey = 131) | (InputKey = 32) | (InputKey = 87))
+            {
+                do player.jump(50);
+            }
+
+            if (Ticks = TicksLimit) // Sys.wait() плохо оптимизирован и он создаёт много артефактов при отрисовке
+            {
+                let tempCubesPointer = 0;
+                let tempSpikesPointer = 0;
+
+                do Screen.clearScreen();
+
+                // Спавн препятствий
+                do createLevel();
+
+                // Обработка кубов
+                while (tempCubesPointer < cubesPointer) 
+                {
+                    let cube = cubes[tempCubesPointer];
+                    if (checkCubeContact(player, cube))
+                    {
+                        do cubes.dispose();
+                        do spikes.dispose();
+                        let cubes = Array.new(100);
+                        let cubesPointer = 0;
+                        let spikes = Array.new(100);
+                        let spikesPointer = 0;
+                        let Timer = 0;
+
+                        do ui.addAttempt();
+                    }
+                    if (cube.update())
+                    {
+                        do cube.dispose();
+                        let delCubesPointer = tempCubesPointer;
+                        while (delCubesPointer < (cubesPointer-1))
+                        {
+                            let cubes[delCubesPointer] = cubes[delCubesPointer+1];
+                            let delCubesPointer = delCubesPointer + 1;
+                        }
+                        let cubesPointer = cubesPointer - 1;
+                        let tempCubesPointer = tempCubesPointer - 1;
+                    }
+                    let tempCubesPointer = tempCubesPointer + 1;
+                }
+
+                // Обработка шипов
+                while (tempSpikesPointer < spikesPointer) 
+                {
+                    let spike = spikes[tempSpikesPointer];
+                    if (((~spike.getReverse()) & checkSpikeContact(player, spike)) | (spike.getReverse() & checkSpikeReverseContact(player, spike)))
+                    {
+                        do cubes.dispose();
+                        do spikes.dispose();
+                        let cubes = Array.new(100);
+                        let cubesPointer = 0;
+                        let spikes = Array.new(100);
+                        let spikesPointer = 0;
+                        let Timer = 0;
+
+                        do ui.addAttempt();
+                    }
+                    if (spike.update())
+                    {
+                        do spike.dispose();
+                        let delSpikesPointer = tempSpikesPointer;
+                        while (delSpikesPointer < (spikesPointer-1))
+                        {
+                            let spikes[delSpikesPointer] = spikes[delSpikesPointer+1];
+                            let delSpikesPointer = delSpikesPointer + 1;
+                        }
+                        let spikesPointer = spikesPointer - 1;
+                        let tempSpikesPointer = tempSpikesPointer - 1;
+                    }
+                    let tempSpikesPointer = tempSpikesPointer + 1;
+                }
+
+                do player.update();
+                do ui.update(Timer);
+                do floor.update();
+                
+                let Ticks = 0;
+                let Timer = Timer + 1;
+
+                // Условие победы
+                if (Timer = WInTime)
+                {
+                    do Output.moveCursor(7,28);
+                    do Output.printString("You win!");
+		   do Sys.wait(1000);
+                    let GameRun = false;
+                }
+            }
+
+            let Ticks = Ticks + 1;
+        }
+
+        do floor.dispose();
+        do player.dispose();
+        return;
+    }
+
+    // Создание уровня
+    method void createLevel()
+    {
+        if ((MathExtension.getRemainder(Timer, 200) = 4) & (Timer > 10))
+        {
+            do addCube(463, FloorHeight-48, 48);
+            do addSpike(463, FloorHeight-48-48, 48, false);
+        } 
+        if ((MathExtension.getRemainder(Timer, 200) = 6) & (Timer > 10))
+        {
+            do addSpike(463, FloorHeight-48, 48, false);
+        } 
+        if (MathExtension.getRemainder(Timer, 200) = 10)
+        {
+            do addCube(463, 0, 48);
+            do addSpike(463, 48, 48, true);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 15)
+        {
+            do addSpike(463, FloorHeight-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 25)
+        {
+            do addCube(463, 0, 48);
+            do addSpike(463, 48, 48, true);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 27)
+        {
+            do addCube(463, 0, 48);
+            do addSpike(463, 48, 48, true);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 33)
+        {
+            do addCube(463, FloorHeight-48, 48);
+            do addSpike(463, FloorHeight-48-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 35)
+        {
+            do addSpike(463, FloorHeight-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 38)
+        {
+            do addSpike(463, 0, 48, true);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 40)
+        {
+            do addCube(463, 0, 48);
+            do addSpike(463, 48, 48, true);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 42)
+        {
+            do addSpike(463, 0, 48, true);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 45)
+        {
+            do addSpike(463, FloorHeight-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 47)
+        {
+            do addCube(463, FloorHeight-48, 48);
+            do addSpike(463, FloorHeight-48-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 49)
+        {
+            do addSpike(463, FloorHeight-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 55)
+        {
+            do addSpike(463, 0, 48, true);
+            do addSpike(463, 48, 48, false);
+            do addCube(463, FloorHeight-48-48, 48);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 57)
+        {
+            do addSpike(463, 0, 48, true);
+            do addSpike(463, 48, 48, false);
+            do addCube(463, FloorHeight-48-48, 48);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 63)
+        {
+            do addSpike(463, FloorHeight-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 68)
+        {
+            do addSpike(463, 0, 48, true);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 70)
+        {
+            do addSpike(463, 0, 48, true);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 74)
+        {
+            do addSpike(463, FloorHeight-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 76)
+        {
+            do addSpike(463, FloorHeight-48-48, 48, false);
+            do addCube(463, FloorHeight-48, 48);
+        }
+
+        if (MathExtension.getRemainder(Timer, 200) = 82)
+        {
+            do addSpike(463, 48, 48, true);
+            do addCube(463, 0, 48);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 84)
+        {
+            do addSpike(463, 48, 48, true);
+            do addCube(463, 0, 48);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 86)
+        {
+            do addSpike(463, 48, 48, false);
+            do addCube(463, FloorHeight-48-48, 48);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 92)
+        {
+            do addSpike(463, FloorHeight-48-48, 48, false);
+            do addCube(463, FloorHeight-48, 48);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 97)
+        {
+            do addSpike(463, 0, 48, true);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 99)
+        {
+            do addSpike(463, 48, 48, true);
+            do addCube(463, 0, 48);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 102)
+        {
+            do addSpike(463, FloorHeight-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 104)
+        {
+            do addCube(463, FloorHeight-48, 48);
+            do addSpike(463, FloorHeight-48-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 106)
+        {
+            do addSpike(463, FloorHeight-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 112)
+        {
+            do addCube(463, FloorHeight-48-48, 48);
+            do addSpike(463, 0, 48, true);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 114)
+        {
+            do addCube(463, FloorHeight-48-48, 48);
+            do addSpike(463, 0, 48, true);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 116)
+        {
+            do addCube(463, FloorHeight-48-48, 48);
+            do addSpike(463, 0, 48, true);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 122)
+        {
+            do addCube(463, FloorHeight-48, 48);
+            do addSpike(463, FloorHeight-48-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 131)
+        {
+            do addCube(463, FloorHeight-48-48, 48);
+            do addCube(463, 48, 48);
+            do addCube(463, 0, 48);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 136)
+        {
+            do addSpike(463, FloorHeight-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 138)
+        {
+            do addSpike(463, FloorHeight-48-48, 48, false);
+            do addCube(463, FloorHeight-48, 48);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 140)
+        {
+            do addSpike(463, FloorHeight-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 148)
+        {
+            do addCube(463, FloorHeight-48, 48);
+            do addSpike(463, FloorHeight-48-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 154)
+        {
+            do addSpike(463, 0, 48, true);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 160)
+        {
+            do addCube(463, FloorHeight-48, 48);
+            do addSpike(463, FloorHeight-48-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 162)
+        {
+            do addSpike(463, FloorHeight-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 168)
+        {
+            do addSpike(463, 0, 48, true);
+            do addSpike(463, FloorHeight-48-48-48, 48, false);
+            do addCube(463, FloorHeight-48-48, 48);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 170)
+        {
+            do addSpike(463, 0, 48, true);
+            do addSpike(463, FloorHeight-48-48-48, 48, false);
+            do addCube(463, FloorHeight-48-48, 48);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 175)
+        {
+            do addSpike(463, FloorHeight-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 177)
+        {
+            do addSpike(463, FloorHeight-48, 48, false);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 182)
+        {
+            do addSpike(463, 0, 48, true);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 184)
+        {
+            do addSpike(463, 0, 48, true);
+        }
+        if (MathExtension.getRemainder(Timer, 200) = 186)
+        {
+            do addSpike(463, 0, 48, true);
+        }
+        return;
+    }
+
+    // Добавление шипа
+    method void addSpike(int x, int y, int s, int r)
+    {
+        let spikes[spikesPointer] = Spike.new(x, y, s, MapSpeed, r);
+        let spikesPointer = spikesPointer + 1;
+        return;
+    }
+
+    // Добавление куба
+    method void addCube(int x, int y, int s)
+    {
+        let cubes[cubesPointer] = Cube.new(x, y, s, MapSpeed);
+        let cubesPointer = cubesPointer + 1;
+        return;
+    }
+
+    // Проверка пересечения игрока и куба
+    method boolen checkCubeContact(Player2 player, Cube cube)
+    {
+        var int pS;
+        var int pX;
+        var int pY;
+        var int cS;
+        var int cX;
+        var int cY;
+
+        var boolen bt;
+        var boolen eq;
+
+        let pS = player.getSize();
+        let pX = player.getCoordX();
+        let pY = player.getCoordY();
+        let cS = cube.getSize();
+        let cX = cube.getCoordX();
+        let cY = cube.getCoordY();
+
+        let bt = ~((pY > (cY+cS)) | ((pY+pS) < cY) | ((pX+pS) < cX) | (pX > (cX+cS)));
+        let eq = ~((pY = (cY+cS)) | ((pY+pS) = cY) | ((pX+pS) = cX) | (pX = (cX+cS)));
+
+        return bt & eq;
+    }
+
+    // Проверка пересечения игрока и шипа
+    method boolen checkSpikeContact(Player2 player, Spike spike)
+    {
+        var int pS;
+        var int pX;
+        var int pY;
+        var int rS;
+        var int rX;
+        var int rY;
+        var boolen belongOneOne;
+        var boolen belongOneTwo;
+        var boolen belongTwoOne;
+        var boolen belongTwoTwo;
+        var boolen belongThreeOne;
+        var boolen belongThreeTwo;
+
+        let pS = player.getSize();
+        let pX = player.getCoordX(); // (A,B) = A=(pX,pY+pS), B=(pX+pS,pY+pS) dlina=48
+        let pY = player.getCoordY();
+        let rS = spike.getSize(); // /\ 
+        let rX = spike.getCoordX(); // p = (rX,rY+rS)
+        let rY = spike.getCoordY(); // AP = sqrt((x - x1)^2 + (y - y1)^2) PB = sqrt((x2 - x)^2 + (y2 - y)^2)
+
+        let belongOneOne = Belong(rX, (rY+rS), pX, (pY+pS));
+        let belongOneTwo = Belong((pX+pS), (pY+pS), rX, (rY+rS));
+        let belongTwoOne = Belong((rX+(rS/2)), rY, pX, (pY+pS));
+        let belongTwoTwo = Belong((pX+pS), (pY+pS), (rX+(rS/2)), rY);
+        let belongThreeOne = Belong((rX+rS), rY+rS, pX, (pY+pS));
+        let belongThreeTwo = Belong((pX+pS), (pY+pS), (rX+rS), rY+rS);
+        
+
+        return (((belongOneOne+belongOneTwo)=48) | ((belongTwoOne+belongTwoTwo)=48) | ((belongThreeOne+belongThreeTwo)=48));
+    }
+
+    // Проверка пересечения игрока и перевёрнутого шипа
+    method boolen checkSpikeReverseContact(Player2 player, Spike spikeReverse)
+    {
+        var int pS;
+        var int pX;
+        var int pY;
+        var int rS;
+        var int rX;
+        var int rY;
+        var boolen belongOneOne;
+        var boolen belongOneTwo;
+        var boolen belongTwoOne;
+        var boolen belongTwoTwo;
+        var boolen belongThreeOne;
+        var boolen belongThreeTwo;
+
+        let pS = player.getSize();
+        let pX = player.getCoordX(); // (A,B) = A=(pX,pY), B=(pX+pS,pY) dlina=48
+        let pY = player.getCoordY();
+        let rS = spikeReverse.getSize(); // /\ 
+        let rX = spikeReverse.getCoordX(); // p = (rX,rY+rS)
+        let rY = spikeReverse.getCoordY(); // AP = sqrt((x - x1)^2 + (y - y1)^2) PB = sqrt((x2 - x)^2 + (y2 - y)^2)
+
+        let belongOneOne = Belong(rX, rY, pX, pY); //p =(rX,rY)
+        let belongOneTwo = Belong((pX+pS), pY, rX, rY);
+        let belongTwoOne = Belong((rX+(rS/2)), rY+rS, pX, pY); // p=(rX+(rS/2),rY+rS)
+        let belongTwoTwo = Belong((pX+pS), pY, (rX+(rS/2)), rY+rS); 
+        let belongThreeOne = Belong((rX+rS), rY, pX, pY); // p =(rX+rS,rY) 
+        let belongThreeTwo = Belong((pX+pS), pY, (rX+rS), rY);
+
+        return (((belongOneOne+belongOneTwo)=rS) | ((belongTwoOne+belongTwoTwo)=rS) | ((belongThreeOne+belongThreeTwo)=rS));
+    }
+
+    method int Belong(int x, int y, int ax, int ay)
+    {
+        var int dx;
+        var int dy;
+        var int temp;
+        let dx = (x-ax);
+        let dy = (y-ay);
+        let temp = MathExtension.abs((dx*dx)+(dy*dy));
+        return (Math.sqrt(temp));
+    }
+
+    method void dispose()
+    {
+        do Memory.deAlloc(this);
+        return;
+    }
+}

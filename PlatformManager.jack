@@ -1,0 +1,126 @@
+/** Implements a graphical Platform. */
+class PlatformManager {
+    field Array platforms;
+    field int nextPosition;
+    field int platformIndex;
+    field int level;
+    field int landingPlatformIndex;
+
+    constructor PlatformManager new() {
+        var int i;
+        let i = 0;
+        let platforms = Array.new(10);
+        let nextPosition = 245;
+        let level = 0;
+        while (i < 10) {
+            let platforms[i] = -1;
+            let i = i + 1;
+        }
+        do generateRandomPlatform();
+        
+        return this;
+    }
+
+    method boolean isPlatformStill() {
+        if (LCGRandom.randRange(0, 10 - level) = 0) {
+            return false;
+        }
+        return true;
+    }
+
+    method void generateRandomPlatform() {
+        while (nextPosition > 13) {
+            let platformIndex = updatePlatformIndex(platformIndex);
+            let platforms[platformIndex] = Platform.new(LCGRandom.randRange(130, 342), nextPosition, isPlatformStill());
+            let nextPosition = nextPosition - LCGRandom.randRange(10, 100); 
+        }
+        return;
+    }
+
+    method int updatePlatformIndex(int index) {
+      if ((index + 1) > 9) {
+         return LCGRandom.mod(index + 1, 10);
+      }
+      return index + 1;
+    }
+
+    method void updatePosition(int downVelocity) {
+        let nextPosition = nextPosition - downVelocity;
+        return;
+    }
+
+    method void movePlatforms(int downVelocity) {
+        var int i;
+        var Platform platformPtr;
+        let i = 0;
+
+        while (i < 10) {
+            let platformPtr = platforms[i];
+            if (~(platforms[i] = -1)) {
+                if (~(downVelocity = 0) & platformPtr.outOfScreen(downVelocity)) {
+                    do platformPtr.erase();
+                    do platformPtr.dispose();
+                    let platforms[i] = -1;
+                } else {
+                    do platformPtr.move(downVelocity);
+                }
+            }
+            let i = i + 1;
+        }
+        do updatePosition(downVelocity);
+        return;
+    }
+
+    method void collideAndReconstruct(int doodleLeft, int doodleRight, int doodleTop, int doodleBottom) {
+        var int i;
+        var Platform platformPtr;
+        let i = 0;
+        while (i < 10) {
+            let platformPtr = platforms[i];
+            if (~(platforms[i] = -1)) {   // First check if platfom collide with doodle. Feed the result into reconstruct to determine whether to reconstruct or not
+                do platformPtr.reconstruct(platformPtr.checkCollide(doodleLeft, doodleRight, doodleTop, doodleBottom));
+            }
+            let i = i + 1;
+        }
+        return;
+    }
+
+    // Adjust the speed so that doodle would land on the platform
+    method boolean platformToLand(int nextDoodleLeft, int nextDoodleRight, int nextDoodleTop, int nextDoodleBottom) {
+        var int i;
+        var int nextSurfaceToLand;
+        var Platform platformPtr;
+        let i = 0;
+        let nextSurfaceToLand = 256;
+        let landingPlatformIndex = -1;
+
+        while (i < 10) {
+            let platformPtr = platforms[i];
+            if (~(platforms[i] = -1)) {   // Check if doodle next frame will make contact with (land on) any platform
+                if (platformPtr.checkContact(nextDoodleLeft, nextDoodleRight, nextDoodleTop, nextDoodleBottom)) {
+                    if (nextSurfaceToLand > platformPtr.getSurface()) {
+                        let nextSurfaceToLand = platformPtr.getSurface();
+                        let landingPlatformIndex = i;
+                    }
+                }
+            }
+            let i = i + 1;
+        }
+        return nextSurfaceToLand;
+    }
+
+    method void updateLevel(int score) {
+        var int tempLevel;
+        let tempLevel = score / 1000;
+        let level = Math.min(tempLevel, 10);
+        return;
+    }
+
+    method int getLandingPlatformIndex() {
+        return landingPlatformIndex;
+    }
+
+    method Platform getPlatformObjectByIndex(int platformIndex) {
+        return platforms[platformIndex];
+    }
+}

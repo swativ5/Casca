@@ -1,0 +1,213 @@
+class DoodleJump {
+   field int maxHeight;
+   field Doodle doodle; // the doodle of this game
+   field int velocity; // the doodle's current velocity
+   field int speed;  // the doodle's left/right speed
+   field PlatformManager platformManager;
+   field int downVelocity;
+   field int score;
+
+   /** Constructs a new Doodle Game. Use a different randomSeed each time a new game start */
+   constructor DoodleJump new(int randomSeed) {
+      // Set random seed
+      do LCGRandom.setSeed(randomSeed);
+
+      // Set max height to 55
+      let maxHeight = 55;
+      // Creates a 32 by 32 pixels doodle
+      let doodle = Doodle.new(256, 100, 31);
+      let platformManager = PlatformManager.new();
+
+      let velocity = 0;
+      let score = 0;
+
+      do separateScreen();
+      do initializeScore();
+      do Sys.wait(1000);
+      return this;
+   }
+
+   /** Disposes this game. */
+   method void dispose() {
+      do doodle.dispose();
+      do Memory.deAlloc(this);
+      return;
+   }
+
+   method void separateScreen() {
+      do Screen.setColor(true);
+      do Screen.drawRectangle(0, 0, 127, 255);
+      do Screen.drawRectangle(384, 0, 511, 255);
+
+      do Screen.drawRectangle(0, 12, 511, 13);
+      return;
+   }
+
+   method void initializeScore() {
+      do Output.moveCursor(0, 17);
+      do Output.printInt(score);
+      return;
+   }
+
+   // Update score and return height(negative speed for platforms to moveDown)
+   method void updateScore() {
+      let score = score - downVelocity;
+      if (score < 0) {
+         let score = 32767;
+      }
+      do Output.moveCursor(0, 17);
+      do Output.printInt(score);
+      return;
+   }
+
+   method void updateScoreAndLevel() {
+      // if downward velocity is not 0 update scores and adjust downVelocity
+      if (downVelocity < 0) {
+         do updateScore();
+         do platformManager.updateLevel(score);
+         let downVelocity = downVelocity + 1;
+      }
+      return;
+   }
+
+   /** Moves the doodle in the current velocity. */
+   method void moveDoodle() {
+      // move doodle up by velocity subtract(add) downward velocity
+      if (velocity > 0) {
+         do doodle.moveUp(velocity + downVelocity);
+      }
+      // if velocity is negative, move doodle down
+      if (velocity < 0) {
+         do doodle.moveDown(velocity);
+      }
+
+      // Decrease velocity
+      let velocity = velocity - 1;
+
+      // Update the velocity to 0 (make doodle still) AFTER the doodle moves up, when there is downward velocity
+      if (downVelocity < 0) {
+         let velocity = 0;
+      }
+
+      // Increase right/left speed
+      do updateSpeed();
+      if (speed > 0) {
+         do doodle.moveRight(speed);
+      }
+      if (speed < 0) {
+         do doodle.moveLeft(speed);
+      }
+      return;
+   }
+
+   // Reach maximum height, initialize down velocity so that doodle will nnot jump out of screen 
+   method int initDownVelocity() {
+      if (downVelocity = 0) {
+         if ((doodle.getDoodleTop() - velocity) < maxHeight) {
+            return -velocity;
+         }
+      }
+      return downVelocity;
+   }
+
+   method void updateSpeed() {
+      var char key;  // the key currently pressed by the user
+      let key = Keyboard.keyPressed();
+      if (key = 0) {
+         let speed = 0;
+      }
+   
+      if ((key = 130) & (speed > -8)) {  // left
+         let speed = speed - 2;
+      }
+      if ((key = 132) & (speed < 8)) {  // right
+         let speed = speed + 2;
+      }
+
+      // Adjust speed when reach left bound or right bound so that memory address would always be valid
+      if ((doodle.getDoodleLeft() + speed) < 128) {
+         let speed = 128 - doodle.getDoodleLeft();
+      }
+      if ((doodle.getDoodleRight() + speed) > 383) {
+         let speed = 383 - doodle.getDoodleRight();
+      }
+
+      return;
+   }
+
+   // Check if doodle can land on any surface (platform or land), and adjust the velocity
+   method boolean findLandingPlatform() {
+      var int platformIndex;
+      var int nextSurfaceToLand;
+
+      let nextSurfaceToLand = platformManager.platformToLand(doodle.getDoodleLeft() + speed, doodle.getDoodleRight() + speed, doodle.getDoodleTop() - velocity, doodle.getDoodleBottom() - velocity);
+      if (nextSurfaceToLand = 256) {
+         return false;
+      }
+
+      let velocity = doodle.getDoodleBottom() - nextSurfaceToLand + 1;
+      return true;
+   }
+
+   // Identify whether land on a spring, and jump!
+   method void jump() {
+      var int platformIndex;
+      var Platform landingPlatform;
+
+      let platformIndex = platformManager.getLandingPlatformIndex();
+      if (platformIndex = -1) {
+         return;
+      }
+      let landingPlatform = platformManager.getPlatformObjectByIndex(platformIndex);
+      if (landingPlatform.hasSpring()) {
+         let velocity = 50;
+      } else {
+         let velocity = 15;
+      }
+      do Sys.wait(10);
+      return;
+   }
+
+   method void run() {
+      var int clock;
+      let clock = 33;
+
+      while (doodle.getDoodleBottom() - velocity < 255) {
+         do platformManager.movePlatforms(downVelocity);
+         do updateScoreAndLevel();
+         if (velocity < 0) {
+            do moveDoodle();
+            do platformManager.collideAndReconstruct(doodle.getDoodleLeft(), doodle.getDoodleRight(), doodle.getDoodleTop(), doodle.getDoodleBottom());
+            if (findLandingPlatform()) {
+               do jump();
+            }
+         } else {
+            // Check if reach max height, if so, set a downward velocity
+            let downVelocity = initDownVelocity();
+            if (~(score = 32767)) {
+               do platformManager.generateRandomPlatform();
+            }
+            do platformManager.collideAndReconstruct(doodle.getDoodleLeft(), doodle.getDoodleRight(), doodle.getDoodleTop(), doodle.getDoodleBottom());
+            do doodle.draw();
+            do moveDoodle();
+            do platformManager.collideAndReconstruct(doodle.getDoodleLeft(), doodle.getDoodleRight(), doodle.getDoodleTop(), doodle.getDoodleBottom());
+         }
+         // Wait 30 clock cycles to let animation show properly
+         do Sys.wait(30);
+      } // while
+      do doodle.erase();
+
+      let clock = 70;
+      while (clock > 0) {
+         do platformManager.movePlatforms(downVelocity);
+         do Sys.wait(30);
+         let clock = clock - 1;
+      }
+      return;
+   }
+
+   // Show score in the ending screen
+   method int getScore() {
+      return score;
+   }
+}

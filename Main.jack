@@ -1,0 +1,319 @@
+class Main { 
+    function void main() {
+        
+        var int i;
+        var int tamaño;
+        var Player1 player;
+        var Obstacle cone0;
+        var Obstacle cone1;
+        var Obstacle cone2;
+        var Obstacle cone3;
+        var Obstacle cone4;
+        var Obstacle cone5;
+        var int score; //determinamos cuantos conos habrá en la pantalla al mismo tiempo.
+        var int contadorScore;  //
+        var int orderCone; //Se usará para indicar el orden en que saldrán los conos.
+        var boolean salir;
+        var int seed;
+        var char key;
+        var boolean showMenu;
+        var boolean Gameover;
+        var int auxiliar;
+        var Array positions1;
+        var Arrayint puntaje;
+        var int contador;
+        var int carril;
+        var int carril1;
+        do Maze.maze();
+        let puntaje = Array.new(5);
+        let puntaje[0] = 0;
+        while(true){
+            let contadorScore = 0;
+            let i = 0;
+            let tamaño = 5;
+            do Screen.clearScreen();
+            let salir = false;
+            let showMenu = true;
+	   
+           
+		 
+
+            while(showMenu){
+		do Menu.showMenu(803);
+		do Output.moveCursor(3, 15);
+		do Output.printString(" That was great!!  Did you see that ?");
+         	do Output.println();
+		do Output.moveCursor(5, 15);
+		 do Output.printString(" I know I am so cool. I am going to be the winner ");
+		do Output.println();
+		do Jack.jill(3001);
+		do Output.moveCursor(8, 10);
+		do Output.printString(" No  !  I am the ruler. Dare you to");
+		do Output.moveCursor(10, 10);
+ 		do Output.printString("defeat me in the upcoming games ");
+		 do Jack.draw1(4995);
+		 do Output.moveCursor(15,15);
+		  do Output.printString("Hi:) ");
+		 do Output.printString("I am Rhythm the Melodious");
+		 do Output.println();
+		do Output.moveCursor(18,15);
+	       do Output.printString("Help me win the game.  Pleaseeee :(");
+		do Sys.wait(3000);
+		do Screen.clearScreen();
+		do Screen.drawRectangle(0,0,50,255);
+	do Screen.drawRectangle(461,0,511,255);
+	 do Screen.drawRectangle(50,205,461,255);
+	 do Screen.drawRectangle(50,0,461,50);
+		do Output.moveCursor(10,19);
+		  do Output.printString("Escape Cars - The Chase");
+		  do Output.moveCursor(13,20);
+		do Output.printString("Hurdles of mobility");
+		
+              
+  while(key=0){
+                    let key = Keyboard.keyPressed();
+                    
+		 
+                }
+	
+                if(key = 32){let showMenu=false;}
+                do Sys.wait(1500);
+                while(~(key=0)){
+                    let key = Keyboard.keyPressed();
+                    let seed = seed + 1;
+                    let carril = Utils.createCarril(seed);
+                    let cone0 =  Obstacle.new(carril);
+                    let carril1 = carril;
+                }
+            }
+            
+            let player = Player1.new(3, 104);
+            let seed = seed + 1;
+            let carril = Utils.createCarril(seed);
+            let cone0 =  Obstacle.new(carril);
+            let carril1 = carril;
+            let cone1 = Obstacle.new(carril);
+            let cone2 = Obstacle.new(0);
+            let cone3 = Obstacle.new(0);
+            let cone4 = Obstacle.new(0);
+            let cone5 = Obstacle.new(0);
+            do Screen.clearScreen();
+            do player.draw();
+            do cone0.draw();
+
+            while(~salir){
+                //do Sys.wait(5);
+
+                while(key=0){
+                    let seed = seed + 1;
+                    let score = score+1;
+                    let key = Keyboard.keyPressed();
+                    if(auxiliar = 50){
+                        if(contadorScore>1 & contadorScore<19){
+                            do cone0.setSeed(score);
+                            let carril = Utils.createCarril(seed);
+                            if(carril=carril1){
+                                let seed = seed + 1;
+                                let carril = Utils.createCarril(seed);
+                            }
+                            let carril1 = carril;
+                            do cone0.moveLeft(carril);
+                        }
+                        if(contadorScore>20 ){
+                            do cone0.setSeed(score);
+                            let carril = Utils.createCarril(seed);
+                            if(carril=carril1){
+                                let seed = seed + 1;
+                                let carril = Utils.createCarril(seed);
+                            }
+                            let carril1 = carril;
+                            do cone0.moveLeft(carril);
+                            do cone1.setSeed(score);
+                            let carril = Utils.createCarril(seed);
+                            if(carril=carril1){
+                                let seed = seed + 1;
+                                let carril = Utils.createCarril(seed);
+                            }
+                            let carril1 = carril;
+                            do cone1.moveLeft(carril);
+                        }
+                        let score = score+1;
+                        if(score>100){
+                            let contadorScore = contadorScore +1;
+                            let score = 0;
+                        }
+                        do Output.moveCursor(0,0);
+                        do Output.printInt(contadorScore);
+                        let auxiliar=0;
+                    }
+                    if ((cone0.hitbox(player.x(), player.y()) = 2) | (cone1.hitbox(player.x(), player.y()) = 2)) {
+                        //do Output.printString("Game Over");
+                        let salir = true;
+                        let key = 1;
+                    }
+                    let auxiliar = auxiliar + 1;
+                    let seed = seed + 1;
+                    //do Sys.wait(5);
+                }
+                if ((cone0.hitbox(player.x(), player.y()) = 2) | (cone1.hitbox(player.x(), player.y()) = 2)) {
+                        let salir = true;
+                }
+                let key = Keyboard.keyPressed();
+                if (key = 131){do player.moveUp(); }//flecha arriba
+                if (key = 133){do player.moveDown();}//flecha abajo
+                if (key = 81){ let salir=true;} //tecla Q
+                
+                let score = score+1;
+                let key = Keyboard.keyPressed();
+                    if(auxiliar = 50){
+                        if(contadorScore>1 & contadorScore<19){
+                            do cone0.setSeed(score);
+                            let carril = Utils.createCarril(seed);
+                            if(carril=carril1){
+                                let seed = seed + 1;
+                                let carril = Utils.createCarril(seed);
+                            }
+                            let carril1 = carril;
+                            do cone0.moveLeft(carril);
+                        }
+                        if(contadorScore>20){
+                            do cone0.setSeed(score);
+                            let carril = Utils.createCarril(seed);
+                            if(carril=carril1){
+                                let seed = seed + 1;
+                                let carril = Utils.createCarril(seed);
+                            }
+                            let carril1 = carril;
+                            do cone0.moveLeft(carril);
+                            do cone1.setSeed(score);
+                            let carril = Utils.createCarril(seed);
+                            if(carril=carril1){
+                                let seed = seed + 1;
+                                let carril = Utils.createCarril(seed);
+                            }
+                            let carril1 = carril;
+                            do cone1.moveLeft(carril);
+                        }
+                        let score = score+1;
+                        if(score>100){
+                            let contadorScore = contadorScore +1;
+                            let score = 0;
+                        }
+                        do Output.moveCursor(0,0);
+                        do Output.printInt(contadorScore);
+                        let auxiliar=0;
+                    }
+                    let auxiliar = auxiliar + 1;
+                
+                while(~(key=0)){
+                    let seed = seed + 1;
+                    let score = score+1;
+                    let key = Keyboard.keyPressed();
+                    if(auxiliar = 50){
+                        if(contadorScore>1 & contadorScore<19){
+                            do cone0.setSeed(score);
+                            let carril = Utils.createCarril(seed);
+                            if(carril=carril1){
+                                let seed = seed + 1;
+                                let carril = Utils.createCarril(seed);
+                            }
+                            let carril1 = carril;
+                            do cone0.moveLeft(carril);
+                        }
+                        if(contadorScore>20 ){
+                            do cone0.setSeed(score);
+                            let carril = Utils.createCarril(seed);
+                            if(carril=carril1){
+                                let seed = seed + 1;
+                                let carril = Utils.createCarril(seed);
+                            }
+                            let carril1 = carril;
+                            do cone0.moveLeft(carril);
+                            do cone1.setSeed(score);
+                            let carril = Utils.createCarril(seed);
+                            if(carril=carril1){
+                                let seed = seed + 1;
+                                let carril = Utils.createCarril(seed);
+                            }
+                            let carril1 = carril;
+                            do cone1.moveLeft(carril);
+                        }
+                        let score = score+1;
+                        if(score>100){
+                            let contadorScore = contadorScore +1;
+                            let score = 0;
+                        }
+                        do Output.moveCursor(0,0);
+                        do Output.printInt(contadorScore);
+                        let auxiliar=0;
+                    }
+                    if ((cone0.hitbox(player.x(), player.y()) = 2) | (cone1.hitbox(player.x(), player.y()) = 2)) {
+                        let salir = true;
+                    }
+                    let auxiliar = auxiliar + 1;
+                    let seed = seed + 1;
+                    //do Sys.wait(3);
+                }
+            }
+            do Sys.wait(500);
+            do Screen.clearScreen();
+            do Utils.tpuntaje(puntaje,contadorScore);
+            let contadorScore = 0;
+            do Output.moveCursor(0,5);
+	    do Output.printString("Best Score:    10000");
+	   do Output.moveCursor(2,5);
+            do Output.printString("Your Score:");
+	   do Output.moveCursor(2,18);
+            do Output.printInt(puntaje[0]);
+		 do Output.moveCursor(6,5);
+            do Menu.showMenu(1540);
+	    do Output.moveCursor(5,15);
+	    do Output.printString("Yeah!! Once again I defeated you.");
+            do Output.moveCursor(6,15);
+	    do Output.printString(" I am declared as winner");
+	    do Jack.jill(3300);
+	    do Output.moveCursor(10,15);
+            do Output.printString("Urgh.. Not again.");
+	   do Output.println();
+	   do Output.moveCursor(12,15);
+            do Output.printString("Come on..  Play this game. There is no victory ");
+		do Output.moveCursor(13,15);
+	  do Output.printString ("only failure.Enjoy the taste of failure ");
+	   do Jack.draw2(5700);
+	  do Output.moveCursor(17,15);
+            do Output.printString("Hey !!  This  is   Pixel the Perceptive.");
+	do Output.println();
+	do Output.moveCursor(18,15);
+	 do Output.printString(" Lets Go!!");
+      do Sys.wait(3000);
+		do Screen.clearScreen();
+		do Screen.drawRectangle(0,0,50,255);
+	do Screen.drawRectangle(461,0,511,255);
+	 do Screen.drawRectangle(50,205,461,255);
+	 do Screen.drawRectangle(50,0,461,50);
+		do Output.moveCursor(7,12);
+		  do Output.printString("Invading Enemy - The Rhythm of Challenge");
+		  do Output.moveCursor(12,18);
+		do Output.printString("Replica of Geometry Dash");
+		do Sys.wait(2000);
+            while(Gameover){
+                while(key=0){
+                    let key = Keyboard.keyPressed();
+                    do GameOver.showGameover(2028);
+                }
+                if(key = 32){let Gameover=false;}
+                
+                while(~(key=0)){
+                    let key = Keyboard.keyPressed();
+                    do GameOver.showGameover(2028);
+                } 
+            }
+
+	     do Sys.wait(3000);
+          do Flow.GeoDash();
+          do Sys.wait(100);
+	do Last.starts();
+        return;	
+    } 
+}
+}

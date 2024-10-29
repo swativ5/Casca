@@ -1,0 +1,37 @@
+class EndingScreen {
+   
+    function void show(int score) {
+	var int bestScore;
+        if (score > bestScore) {
+            let bestScore = 30000;
+        }
+	do Screen.drawRectangle(0,0,170,255);
+	do Jack.win(1007);
+	do Screen.drawRectangle(350,0,510,255);
+        do Output.moveCursor(7, 25);
+        do Output.printString("Best score: ");
+        do Output.printInt(bestScore);
+        do Output.moveCursor(9, 25);
+        do Output.printString("Your score: ");
+        do Output.printInt(score);
+	do Output.moveCursor(11,25);
+	do Output.printString("GOOD JOB :)-");
+        do Output.moveCursor(13,25);
+	do Output.printString("Game Developers- ");
+        do Output.println();
+	do Output.moveCursor(14,25);
+	do Output.printString("Neha ");
+        do Output.println();
+	do Output.moveCursor(15,25);
+	do Output.printString("Swati ");
+	do Output.println();
+	do Output.moveCursor(16,25);
+	do Output.printString("Hima");
+	do Output.println();
+	do Output.moveCursor(17,25);
+	do Output.printString("Navya");
+	do Output.println();
+        return;
+    }
+
+}

@@ -1,0 +1,65 @@
+class Player2
+{
+    field int CoordX;
+    field int CoordY;
+    field int StartCoordY;
+    field int Size;
+    field int SpeedY;
+
+    constructor Player2 new(int x, int y, int size) 
+    {
+        let CoordX = x;
+        let CoordY = y;
+        let StartCoordY = y;
+        let Size = size;
+        let SpeedY = 0;
+        return this;
+    }
+
+    // Прыжок и его блокировка
+    method void jump(int force) {
+        if (CoordY = StartCoordY)
+        {
+            let SpeedY = force;
+            let CoordY = CoordY - 1;
+        }
+        return;
+    }
+
+    method void update() {
+        if (CoordY < StartCoordY)
+        {
+            let CoordY = CoordY - SpeedY + 5;// x = x0 + vt + (at^2)/2
+            let SpeedY = SpeedY - 10;
+        }
+        if (CoordY > StartCoordY)
+        {
+            let CoordY = StartCoordY;
+            let SpeedY = 0;
+        }
+        do Jack.draw2(32*CoordY+(CoordX/16));
+        return;
+    }
+
+    method int getCoordX()
+    {
+        return CoordX;
+    }
+
+    method int getCoordY()
+    {
+        return CoordY;
+    }
+
+    method int getSize()
+    {
+        return Size;
+    }
+
+    method void dispose()
+    {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+   }

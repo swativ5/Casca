@@ -1,0 +1,41 @@
+class Floor 
+{
+    field int CoordY;
+    field int CoordX;
+    field int Speed;
+
+    constructor Floor new(int y, int speed) 
+    {
+        let CoordY = y;
+        let CoordX = 0;
+        let Speed = speed;
+        return this;
+    }
+
+    method void update()
+    {
+        var int tempCoordX;
+        if (CoordX < 0)
+        {
+            let CoordX = 48;
+        }
+        let tempCoordX = CoordX;
+        do Screen.drawLine(0, CoordY, 511, CoordY);
+        do Screen.drawLine(0, CoordY+1, 511, CoordY+1);
+        do Screen.drawLine(0, CoordY+2, 511, CoordY+2);
+        while (tempCoordX < 464) {
+            do Screen.drawLine(tempCoordX, 255, tempCoordX + 48, CoordY);
+            do Screen.drawLine(tempCoordX+1, 255, tempCoordX + 49, CoordY);
+            do Screen.drawLine(tempCoordX+2, 255, tempCoordX + 50, CoordY);
+            let tempCoordX = tempCoordX + 48;
+        }
+        let CoordX = CoordX - Speed;
+        return;
+    }
+
+    method void dispose()
+    {
+        do Memory.deAlloc(this);
+        return;
+    }
+}

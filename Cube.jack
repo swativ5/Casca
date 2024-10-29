@@ -1,0 +1,60 @@
+class Cube 
+{
+    field int CoordX;
+    field int CoordY;
+    field int Size;
+    field int Speed;
+
+    constructor Cube new(int x, int y, int size, int speed) 
+    {
+        let CoordX = x;
+        let CoordY = y;
+        let Size = size;
+        let Speed = speed;
+        return this;
+    }
+
+    method boolen update() {
+        let CoordX = CoordX - Speed;
+        if (CoordX < 0)
+        {
+            return true;
+        }
+        do draw();
+        return false;
+    }
+
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(CoordX, CoordY, CoordX+Size, CoordY+Size);
+        do Screen.setColor(false);
+        do Screen.drawRectangle(CoordX+2, CoordY+2, CoordX+Size-2, CoordY+Size-2);
+        do Screen.setColor(true);
+        return;
+    }
+
+    method int getCoordX()
+    {
+        return CoordX;
+    }
+
+    method int getCoordY()
+    {
+        return CoordY;
+    }
+
+    method int getSize()
+    {
+        return Size;
+    }
+
+    method Cube copy () {
+        return Cube.new(CoordX, CoordY, Size, Speed);
+    }
+
+    method void dispose()
+    {
+        do Memory.deAlloc(this);
+        return;
+    }
+}

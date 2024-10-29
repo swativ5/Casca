@@ -1,0 +1,90 @@
+class Spike 
+{
+    field int CoordX;
+    field int CoordY;
+    field int Size;
+    field int Speed;
+    field boolen Reverse;
+
+    constructor Spike new(int x, int y, int size, int speed, boolen reverse) 
+    {
+        let CoordX = x;
+        let CoordY = y;
+        let Size = size;
+        let Speed = speed;
+        let Reverse = reverse;
+        return this;
+    }
+
+    method boolen update() {
+        let CoordX = CoordX - Speed;
+        if (CoordX < 0)
+        {
+            return true;
+        }
+        if (Reverse)
+        {
+            do drawReverse();
+            return false;
+        }
+        do draw();
+        return false;
+    }
+
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawLine(CoordX, CoordY+Size, CoordX+Size, CoordY+Size);  // _
+        do Screen.drawLine(CoordX+1, CoordY+Size-1, CoordX+Size-1, CoordY+Size-1);
+
+        do Screen.drawLine(CoordX+(Size/2), CoordY, CoordX+Size, CoordY+Size); // \
+        do Screen.drawLine(CoordX+(Size/2), CoordY+1, CoordX+Size-1, CoordY+Size);
+
+        do Screen.drawLine(CoordX+(Size/2), CoordY, CoordX, CoordY+Size); // /
+        do Screen.drawLine(CoordX+(Size/2), CoordY+1, CoordX+1, CoordY+Size);
+        return;
+    }
+
+    method void drawReverse()
+    {
+        do Screen.setColor(true);
+        do Screen.drawLine(CoordX, CoordY, CoordX+Size, CoordY);  // _
+        do Screen.drawLine(CoordX+1, CoordY+1, CoordX+Size-1, CoordY+1);
+        
+        do Screen.drawLine(CoordX, CoordY, CoordX+(Size/2), CoordY+Size); // \
+        do Screen.drawLine(CoordX-1, CoordY, CoordX+(Size/2)-1, CoordY+Size);
+
+        do Screen.drawLine(CoordX+Size, CoordY, CoordX+(Size/2), CoordY+Size); // /
+        do Screen.drawLine(CoordX+Size-1, CoordY, CoordX+(Size/2)-1, CoordY+Size);
+        return;
+    }
+
+    method int getCoordX()
+    {
+        return CoordX;
+    }
+
+    method int getCoordY()
+    {
+        return CoordY;
+    }
+
+    method int getSize()
+    {
+        return Size;
+    }
+
+    method int getReverse()
+    {
+        return Reverse;
+    }
+
+    method Spike copy () {
+        return Spike.new(CoordX, CoordY, Size, Speed, Reverse);
+    }
+
+    method void dispose()
+    {
+        do Memory.deAlloc(this);
+        return;
+    }
+}

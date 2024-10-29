@@ -1,0 +1,116 @@
+class Maze {
+	function void maze() {
+		var int startRand, temp, temp2, mazeWidth, mazeHeight, xOrigin, yOrigin, bw, bh, padding;
+        var PseudoRand rng;
+        var Array maze, tempArr;
+       	var Player4 player;
+       	var PlayerController controller;
+       	//maze width indicates number of blocks right to left
+       	//maze height indicates number of blocks top to bottom
+
+       	//Settings
+       	let mazeWidth = 16;
+       	let mazeHeight = 10;
+       	let xOrigin = 104;
+       	let yOrigin = 8;
+       	let bw = 24;
+       	let bh = 24;
+       	let padding = 6;
+
+   
+		let startRand = Maze.getFirstKeyPressed();
+		let rng = PseudoRand.def(startRand); //user input is the seed
+		do intro.intro(1612);
+		do Output.moveCursor(8,22);
+		do Output.printString("A captivating Saga");
+	do Output.moveCursor(5,22);
+	do Jill.jill(2500);
+	do Output.moveCursor(5,22);
+	do Jack.jill(3000);
+     do Sys.wait(2002);
+       do Output.moveCursor(16,0);
+	do Output.printString("             Once upon a time, there lived a legend  called       Jack. He travelled the lands of Aetheria,visciously defeating   monsters and conquering new kingdoms. ");
+do Output.println();
+do Output.println();
+do Output.printString("  We shall see a few glimpses of their glorious conquests");
+	         do Sys.wait(5000);
+		do Screen.clearScreen();
+		do Screen.drawRectangle(0,0,50,255);
+	do Screen.drawRectangle(461,0,511,255);
+	 do Screen.drawRectangle(50,205,461,255);
+	 do Screen.drawRectangle(50,0,461,50);
+		do Screen.setColor(false);
+		do Output.moveCursor(11,20);
+		do Output.printString("Maze - the Beginning");
+		do Sys.wait(1000);
+		do Screen.clearScreen();
+		do Jack.draw(6050);
+		do Output.moveCursor(2, 1);
+		do Output.printString("I am ");
+		do Output.moveCursor(4, 1);
+		do Output.printString("Echo - the");
+		do Output.moveCursor(6, 1);
+		do Output.printString("Enigmatic");
+		do Output.moveCursor(8, 1);
+		do Output.printString("I must");
+		do Output.moveCursor(10, 1);
+		 do Output.printString("conquer this ");
+		do Output.moveCursor(12, 1);
+		do Output.printString("arena to win");
+		do Output.moveCursor(14, 1);
+		do Output.printString(" the war. .");
+
+		let maze = Array.new(mazeHeight); //array of arrays
+		let temp = 0;
+		while(temp < mazeHeight){
+			let maze[temp] = Array.new(mazeWidth);
+			let temp2 = 0;
+			while(temp2 < mazeWidth){
+				let tempArr = maze[temp];
+				let tempArr[temp2] = 0;
+				let temp2 = temp2 + 1;
+			}
+			let temp = temp + 1;
+		}
+
+
+		do MazeGenerator.generate(maze, rng, mazeWidth, mazeHeight);
+		//Array maze, int originX, int originY, int blockWidth, int blockHeight, int xCount, int yCount
+		do MazeDrawer.drawMaze(maze, xOrigin, yOrigin, bw, bh, mazeWidth, mazeHeight);
+
+		let player = Player4.new(0, 0); //starting point is top left
+
+		let controller = PlayerController.new(player, maze, xOrigin, yOrigin,
+		 bw, bh, mazeWidth, mazeHeight, padding);
+
+		do Maze.drawEndPoint(xOrigin, yOrigin, bw, bh, mazeWidth, mazeHeight, 8);
+		
+
+		do controller.loop();
+
+		do Screen.setColor(false);
+		do Screen.drawRectangle(0, 0, 511, 255);
+
+		do Screen.setColor(true);
+		do Output.moveCursor(11, 28);
+		do Output.printString("YOU WON!");
+		do Sys.wait(1500);
+		return;
+	}
+
+	function void drawEndPoint(int baseX, int baseY, int bw, int bh, int xc, int yc, int rad){
+		do Screen.setColor(true);
+		do Jack.draw3(508);
+		return;
+	}
+
+	function int getFirstKeyPressed(){
+		var char key;
+		let key = 0;
+		while(key = 0){
+			let key = Keyboard.keyPressed();
+		}
+		return key;
+	}
+
+}

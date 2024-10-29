@@ -1,0 +1,19 @@
+class Last {
+function void starts(){
+	   var int randomSeed;
+           var DoodleJump game1;
+	 let randomSeed = 99;
+            do Screen.clearScreen();
+            do MainMenu.init();
+            while (~(Keyboard.keyPressed() = 32)) {
+                do Sys.wait(100);
+            }
+            do Screen.clearScreen();
+            let game1 = DoodleJump.new(randomSeed);
+            do game1.run();
+            do game1.dispose();
+            do Screen.clearScreen();
+        do EndingScreen.show(game1.getScore());
+return;
+}
+}

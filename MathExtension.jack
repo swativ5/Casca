@@ -1,0 +1,21 @@
+class MathExtension {
+
+    // Возвращает абсолютное значение
+    function int abs(int number) {
+        if (number < 0) {
+            return -number;
+        } else {
+            return number;
+        }
+    }
+
+    // Возвращает остаток от деления
+    function int getRemainder (int divid, int divider) 
+    {
+        var int division;
+        var int remains;
+        let division = divid/divider;
+        let remains = divid-(division*divider);
+        return remains;
+    }
+}

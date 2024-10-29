@@ -1,0 +1,12 @@
+class Flow {
+   // start screen
+
+function void GeoDash(){
+var GeometryDash game;
+	let game = GeometryDash.new();
+        do game.run();
+        //do game.dispose();
+  
+return;
+}
+}
